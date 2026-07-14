@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Капитал</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --page:#f9f9f7; --surface:#fcfcfb;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --border:rgba(11,11,11,0.10);
+    --good:#006300; --bad:#c0322f;
+    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#008300;
+    --accent:#2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page:#0d0d0d; --surface:#1a1a19;
+      --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
+      --good:#0ca30c; --bad:#e66767;
+      --c-bank:#3987e5; --c-cash:#199e70; --c-crypto:#c98500; --c-deposit:#008300;
+      --accent:#3987e5;
+    }
+  }
+  :root[data-theme="light"] {
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --border:rgba(11,11,11,0.10); --good:#006300; --bad:#c0322f;
+    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#008300; --accent:#2a78d6;
+  }
+  :root[data-theme="dark"] {
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --border:rgba(255,255,255,0.10); --good:#0ca30c; --bad:#e66767;
+    --c-bank:#3987e5; --c-cash:#199e70; --c-crypto:#c98500; --c-deposit:#008300; --accent:#3987e5;
+  }
+
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body {
+    background:var(--page); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.4;
+  }
+  .app { max-width:460px; margin:0 auto; padding:16px 14px 40px; display:flex; flex-direction:column; gap:14px; }
+
+  .topbar { display:flex; align-items:baseline; justify-content:space-between; padding:2px 2px 0; }
+  .topbar h1 { font-size:15px; font-weight:600; margin:0; letter-spacing:.02em; }
+  .topbar .upd { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+
+  .card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:16px; padding:16px;
+  }
+  .eyebrow {
+    font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 12px;
+  }
+
+  /* Hero */
+  .hero .label { font-size:12px; color:var(--ink2); margin-bottom:4px; }
+  .hero .total { font-size:clamp(32px,10vw,42px); font-weight:700; line-height:1.05; letter-spacing:-.01em; }
+  .hero .total .cur { font-size:.5em; font-weight:600; color:var(--ink2); margin-left:4px; }
+  .chip {
+    display:inline-flex; align-items:center; gap:5px; margin-top:12px;
+    font-size:13px; font-weight:600; font-variant-numeric:tabular-nums;
+    padding:4px 10px; border-radius:999px; border:1px solid var(--border);
+  }
+  .chip.up { color:var(--good); }
+  .chip.down { color:var(--bad); }
+  .chip .since { color:var(--muted); font-weight:500; }
+
+  /* Allocation bar */
+  .bar { display:flex; gap:2px; width:100%; height:20px; margin-bottom:14px; }
+  .bar .seg { height:100%; border-radius:4px; min-width:3px; transition:flex-basis .5s ease; cursor:default; }
+  .legend { display:flex; flex-direction:column; gap:10px; }
+  .legrow { display:flex; align-items:center; gap:10px; font-size:14px; }
+  .dot { width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+  .legrow .name { color:var(--ink2); }
+  .legrow .pct { color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+  .legrow .amt { margin-left:auto; font-weight:600; font-variant-numeric:tabular-nums; }
+
+  /* Accounts */
+  .rows { display:flex; flex-direction:column; }
+  .row { display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--grid); }
+  .row:first-child { border-top:0; }
+  .row .name { display:flex; align-items:center; gap:9px; min-width:0; }
+  .row .name span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .val { margin-left:auto; text-align:right; }
+  .row .val b { font-weight:600; font-variant-numeric:tabular-nums; }
+  .row .val small { display:block; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+
+  /* Bridge (adjustments to net worth) */
+  .bridge { display:flex; flex-direction:column; gap:0; }
+  .bline { display:flex; align-items:center; justify-content:space-between; padding:9px 0; font-size:14px; border-top:1px solid var(--grid); }
+  .bline:first-child { border-top:0; }
+  .bline .k { color:var(--ink2); }
+  .bline .v { font-weight:600; font-variant-numeric:tabular-nums; }
+  .bline.total { border-top:1.5px solid var(--border); margin-top:2px; padding-top:12px; }
+  .bline.total .k { color:var(--ink); font-weight:600; }
+  .bline.total .v { font-size:16px; }
+  .pos { color:var(--good); }
+  .neg { color:var(--bad); }
+
+  .foot { text-align:center; font-size:12px; color:var(--muted); line-height:1.6; }
+  .foot .demo { display:inline-block; margin-top:6px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; }
+
+  /* tooltip */
+  #tip {
+    position:fixed; z-index:10; pointer-events:none; opacity:0; transition:opacity .12s;
+    background:var(--ink); color:var(--surface); font-size:12px; font-weight:600;
+    padding:5px 9px; border-radius:8px; white-space:nowrap; transform:translate(-50%,-125%);
+  }
+  @media (prefers-reduced-motion: reduce) { .bar .seg { transition:none; } }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div id="tip"></div>
+<script>
+const KINDS = [
+  { key:"bank",    label:"Банки",    v:"--c-bank" },
+  { key:"cash",    label:"Наличные", v:"--c-cash" },
+  { key:"crypto",  label:"Крипта",   v:"--c-crypto" },
+  { key:"deposit", label:"Вклады",   v:"--c-deposit" },
+];
+const KIND_LABEL = Object.fromEntries(KINDS.map(k => [k.key, k.label]));
+const KIND_VAR   = Object.fromEntries(KINDS.map(k => [k.key, k.v]));
+
+const DEMO = {
+  cur:"₽", total:280576, delta:12000, since:"07.07",
+  assets:377576, lent:5000, borrowed:2000, carousel:100000,
+  accounts:[
+    {name:"Сбер",        kind:"bank",    cur:"RUB", bal:100000, rub:100000},
+    {name:"Тинькофф",    kind:"bank",    cur:"RUB", bal:0,      rub:0},
+    {name:"Наличные USD",kind:"cash",    cur:"USD", bal:1000,   rub:77490},
+    {name:"BTC",         kind:"crypto",  cur:"BTC", bal:0.01,   rub:50086},
+    {name:"Яндекс вклад",kind:"deposit", cur:"RUB", bal:150000, rub:150000},
+  ],
+  rates:{USD:77.49, BTC:5008656}, ts:"22:10, 14.07", demo:true
+};
+
+const nf0 = new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
+const nf2 = new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
+function money(x){ return nf0.format(Math.round(x)); }
+function amount(x, cur){
+  if (cur==="BTC"||cur==="ETH") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"") + " " + cur;
+  if (cur==="USD") return nf2.format(x) + " $";
+  if (cur==="USDT") return nf2.format(x) + " USDT";
+  return nf0.format(Math.round(x)) + " ₽";
+}
+
+function readPayload(){
+  const p = new URLSearchParams(location.search).get("d");
+  if (!p) return null;
+  try {
+    const b64 = p.replace(/-/g,"+").replace(/_/g,"/");
+    return JSON.parse(decodeURIComponent(escape(atob(b64))));
+  } catch(e){ return null; }
+}
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function render(d){
+  const app = document.getElementById("app");
+  // группируем активы по типу
+  const byKind = {};
+  for (const a of d.accounts) byKind[a.kind] = (byKind[a.kind]||0) + a.rub;
+  const segs = KINDS.filter(k => (byKind[k.key]||0) > 0)
+                    .map(k => ({...k, sum: byKind[k.key]}));
+  const assets = d.assets || segs.reduce((s,x)=>s+x.sum,0) || 1;
+
+  const bar = segs.map(s =>
+    `<div class="seg" style="flex-basis:${(s.sum/assets*100).toFixed(2)}%;background:var(${s.v})"
+      data-tip="${s.label} — ${money(s.sum)} ₽ · ${Math.round(s.sum/assets*100)}%"></div>`
+  ).join("");
+
+  const legend = segs.map(s =>
+    `<div class="legrow">
+       <span class="dot" style="background:var(${s.v})"></span>
+       <span class="name">${s.label}</span>
+       <span class="pct">${Math.round(s.sum/assets*100)}%</span>
+       <span class="amt">${money(s.sum)} ₽</span>
+     </div>`
+  ).join("");
+
+  const accs = d.accounts.map(a => {
+    const sub = a.cur!=="RUB" ? `<small>≈ ${money(a.rub)} ₽</small>` : "";
+    return `<div class="row">
+      <div class="name"><span class="dot" style="background:var(${KIND_VAR[a.kind]||'--muted'})"></span><span>${a.name}</span></div>
+      <div class="val"><b>${amount(a.bal, a.cur)}</b>${sub}</div>
+    </div>`;
+  }).join("");
+
+  const bridge = [];
+  bridge.push(`<div class="bline"><span class="k">Активы</span><span class="v">${money(d.assets)} ₽</span></div>`);
+  if (d.lent)     bridge.push(`<div class="bline"><span class="k">Мне должны</span><span class="v pos">+${money(d.lent)} ₽</span></div>`);
+  if (d.borrowed) bridge.push(`<div class="bline"><span class="k">Я должен</span><span class="v neg">−${money(d.borrowed)} ₽</span></div>`);
+  if (d.carousel) bridge.push(`<div class="bline"><span class="k">Карусель (долг банку)</span><span class="v neg">−${money(d.carousel)} ₽</span></div>`);
+  bridge.push(`<div class="bline total"><span class="k">Чистый капитал</span><span class="v">${money(d.total)} ₽</span></div>`);
+
+  let chip = "";
+  if (d.delta !== null && d.delta !== undefined){
+    const up = d.delta >= 0;
+    chip = `<div class="chip ${up?"up":"down"}">${up?"▲":"▼"} ${up?"+":"−"}${money(Math.abs(d.delta))} ₽
+             <span class="since">с ${d.since||""}</span></div>`;
+  }
+
+  const rateBits = [];
+  if (d.rates && d.rates.USD) rateBits.push(`USD ${nf2.format(d.rates.USD)} ₽`);
+  if (d.rates && d.rates.BTC) rateBits.push(`BTC ${money(d.rates.BTC)} ₽`);
+
+  app.innerHTML = `
+    <div class="topbar"><h1>💼 Мой капитал</h1><div class="upd">${d.ts||""}</div></div>
+
+    <div class="card hero">
+      <div class="label">Чистый капитал</div>
+      <div class="total">${money(d.total)}<span class="cur">₽</span></div>
+      ${chip}
+    </div>
+
+    ${segs.length ? `<div class="card">
+      <p class="eyebrow">Активы по типам</p>
+      <div class="bar">${bar}</div>
+      <div class="legend">${legend}</div>
+    </div>` : ""}
+
+    <div class="card">
+      <p class="eyebrow">Счета</p>
+      <div class="rows">${accs || '<div class="row"><span class="name">Пока нет счетов</span></div>'}</div>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Как складывается капитал</p>
+      <div class="bridge">${bridge.join("")}</div>
+    </div>
+
+    <div class="foot">
+      ${rateBits.join(" · ")}
+      ${d.demo ? '<br><span class="demo">демо-данные</span>' : ""}
+    </div>`;
+
+  wireTooltip();
+}
+
+function wireTooltip(){
+  const tip = document.getElementById("tip");
+  document.querySelectorAll(".seg[data-tip]").forEach(el => {
+    const show = (x,y) => { tip.textContent = el.dataset.tip; tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.opacity="1"; };
+    const hide = () => tip.style.opacity="0";
+    el.addEventListener("mousemove", e => show(e.clientX, e.clientY));
+    el.addEventListener("mouseleave", hide);
+    el.addEventListener("touchstart", e => { const t=e.touches[0]; show(t.clientX, t.clientY); }, {passive:true});
+    el.addEventListener("touchend", () => setTimeout(hide, 1200));
+  });
+}
+
+// тема из Telegram, иначе — системная
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg){
+  tg.ready(); tg.expand();
+  const applyTheme = () => document.documentElement.setAttribute("data-theme", tg.colorScheme);
+  applyTheme(); tg.onEvent("themeChanged", applyTheme);
+}
+
+render(readPayload() || DEMO);
+</script>
+</body>
+</html>
