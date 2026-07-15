@@ -147,6 +147,7 @@ function amount(x, cur){
   if (cur==="BTC"||cur==="ETH") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"") + " " + cur;
   if (cur==="USD") return nf2.format(x) + " $";
   if (cur==="USDT") return nf2.format(x) + " USDT";
+  if (cur==="KGS") return nf2.format(x) + " сом";
   return nf0.format(Math.round(x)) + " ₽";
 }
 
