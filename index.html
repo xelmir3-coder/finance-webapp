@@ -7,111 +7,134 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --page:#f9f9f7; --surface:#fcfcfb;
-    --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-    --grid:#e1e0d9; --border:rgba(11,11,11,0.10);
-    --good:#006300; --bad:#c0322f;
-    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#008300;
-    --accent:#2a78d6;
+    --page:#eef0f3; --surface:#ffffff; --surface-2:#f6f7f9;
+    --ink:#0e1116; --ink2:#565d68; --muted:#8a919c;
+    --grid:#e7e9ee; --border:rgba(14,17,22,0.08);
+    --accent:#2a78d6; --accent-soft:rgba(42,120,214,0.10);
+    --growth:#0a8f5f; --decline:#c23b32;
+    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9;
+    --shadow:0 1px 2px rgba(14,17,22,.05), 0 10px 30px -12px rgba(14,17,22,.18);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --page:#0d0d0d; --surface:#1a1a19;
-      --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
-      --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
-      --good:#0ca30c; --bad:#e66767;
-      --c-bank:#3987e5; --c-cash:#199e70; --c-crypto:#c98500; --c-deposit:#008300;
-      --accent:#3987e5;
+      --page:#0c0e12; --surface:#15181e; --surface-2:#1b1f27;
+      --ink:#f3f5f8; --ink2:#aab2bf; --muted:#727a86;
+      --grid:#242932; --border:rgba(255,255,255,0.09);
+      --accent:#4d97ef; --accent-soft:rgba(77,151,239,0.14);
+      --growth:#1fce8c; --decline:#e2685c;
+      --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
     }
   }
-  :root[data-theme="light"] {
-    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-    --grid:#e1e0d9; --border:rgba(11,11,11,0.10); --good:#006300; --bad:#c0322f;
-    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#008300; --accent:#2a78d6;
+  :root[data-theme="light"]{
+    --page:#eef0f3; --surface:#ffffff; --surface-2:#f6f7f9; --ink:#0e1116; --ink2:#565d68; --muted:#8a919c;
+    --grid:#e7e9ee; --border:rgba(14,17,22,0.08); --accent:#2a78d6; --accent-soft:rgba(42,120,214,0.10);
+    --growth:#0a8f5f; --decline:#c23b32; --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9;
+    --shadow:0 1px 2px rgba(14,17,22,.05), 0 10px 30px -12px rgba(14,17,22,.18);
   }
-  :root[data-theme="dark"] {
-    --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
-    --grid:#2c2c2a; --border:rgba(255,255,255,0.10); --good:#0ca30c; --bad:#e66767;
-    --c-bank:#3987e5; --c-cash:#199e70; --c-crypto:#c98500; --c-deposit:#008300; --accent:#3987e5;
+  :root[data-theme="dark"]{
+    --page:#0c0e12; --surface:#15181e; --surface-2:#1b1f27; --ink:#f3f5f8; --ink2:#aab2bf; --muted:#727a86;
+    --grid:#242932; --border:rgba(255,255,255,0.09); --accent:#4d97ef; --accent-soft:rgba(77,151,239,0.14);
+    --growth:#1fce8c; --decline:#e2685c; --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
   }
 
   * { box-sizing:border-box; }
-  html, body { margin:0; }
-  body {
+  html,body { margin:0; }
+  body{
     background:var(--page); color:var(--ink);
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-    -webkit-font-smoothing:antialiased; line-height:1.4;
+    -webkit-font-smoothing:antialiased; line-height:1.45;
   }
-  .app { max-width:460px; margin:0 auto; padding:16px 14px 40px; display:flex; flex-direction:column; gap:14px; }
+  .app{ max-width:480px; margin:0 auto; padding:18px 14px 44px; display:flex; flex-direction:column; gap:13px; }
 
-  .topbar { display:flex; align-items:baseline; justify-content:space-between; padding:2px 2px 0; }
-  .topbar h1 { font-size:15px; font-weight:600; margin:0; letter-spacing:.02em; }
-  .topbar .upd { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:2px 4px 4px; }
+  .topbar .brand{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; letter-spacing:.01em; }
+  .topbar .brand .mk{ width:22px; height:22px; border-radius:7px; display:grid; place-items:center; background:var(--accent-soft); font-size:13px; }
+  .topbar .upd{ font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
 
-  .card {
+  .card{
     background:var(--surface); border:1px solid var(--border);
-    border-radius:16px; padding:16px;
+    border-radius:18px; padding:17px 16px; box-shadow:var(--shadow);
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) both;
   }
-  .eyebrow {
-    font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
-    color:var(--muted); margin:0 0 12px;
-  }
+  .app > .card:nth-child(2){ animation-delay:.02s; }
+  .app > .card:nth-child(3){ animation-delay:.06s; }
+  .app > .card:nth-child(4){ animation-delay:.10s; }
+  .app > .card:nth-child(5){ animation-delay:.14s; }
+  .app > .card:nth-child(6){ animation-delay:.18s; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(9px);} to{ opacity:1; transform:none;} }
+
+  .eyebrow{ display:flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.10em; text-transform:uppercase; color:var(--muted); margin:0 0 13px; }
+  .eyebrow::before{ content:""; width:5px; height:5px; border-radius:99px; background:var(--accent); }
 
   /* Hero */
-  .hero .label { font-size:12px; color:var(--ink2); margin-bottom:4px; }
-  .hero .total { font-size:clamp(32px,10vw,42px); font-weight:700; line-height:1.05; letter-spacing:-.01em; }
-  .hero .total .cur { font-size:.5em; font-weight:600; color:var(--ink2); margin-left:4px; }
-  .chip {
-    display:inline-flex; align-items:center; gap:5px; margin-top:12px;
-    font-size:13px; font-weight:600; font-variant-numeric:tabular-nums;
-    padding:4px 10px; border-radius:999px; border:1px solid var(--border);
-  }
-  .chip.up { color:var(--good); }
-  .chip.down { color:var(--bad); }
-  .chip .since { color:var(--muted); font-weight:500; }
+  .hero .label{ font-size:12.5px; color:var(--ink2); margin-bottom:6px; letter-spacing:.01em; }
+  .hero .total{ font-size:clamp(36px,11.5vw,50px); font-weight:750; line-height:1; letter-spacing:-.022em; font-variant-numeric:tabular-nums; }
+  .hero .total .cur{ font-size:.44em; font-weight:600; color:var(--ink2); margin-left:6px; letter-spacing:0; }
+  .hero .sub{ margin-top:7px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .chip{ display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:13px; font-weight:650; font-variant-numeric:tabular-nums; padding:5px 11px 5px 9px; border-radius:999px; }
+  .chip.up{ color:var(--growth); background:color-mix(in srgb, var(--growth) 12%, transparent); }
+  .chip.down{ color:var(--decline); background:color-mix(in srgb, var(--decline) 12%, transparent); }
+  .chip .since{ color:var(--muted); font-weight:500; }
 
-  /* Allocation bar */
-  .bar { display:flex; gap:2px; width:100%; height:20px; margin-bottom:14px; }
-  .bar .seg { height:100%; border-radius:4px; min-width:3px; transition:flex-basis .5s ease; cursor:default; }
-  .legend { display:flex; flex-direction:column; gap:10px; }
-  .legrow { display:flex; align-items:center; gap:10px; font-size:14px; }
-  .dot { width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
-  .legrow .name { color:var(--ink2); }
-  .legrow .pct { color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
-  .legrow .amt { margin-left:auto; font-weight:600; font-variant-numeric:tabular-nums; }
+  /* Chart */
+  .chartwrap{ position:relative; width:100%; }
+  svg.chart{ display:block; width:100%; height:auto; overflow:visible; touch-action:pan-y; }
+  .chart .grid{ stroke:var(--grid); stroke-width:1; }
+  .chart .area{ opacity:.9; }
+  .chart .line{ fill:none; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+  .chart .pt{ fill:var(--surface); stroke-width:2; }
+  .chart .pt.last{ r:4.5; }
+  .chart .xlab{ fill:var(--muted); font-size:10px; font-family:system-ui,sans-serif; }
+  .chart .vlab{ font-size:11px; font-weight:700; font-family:system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  .chart .cross{ stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; opacity:0; }
+  .chart .focus{ opacity:0; stroke-width:2.5; }
+  .emptychart{ color:var(--muted); font-size:13px; text-align:center; padding:22px 6px; }
+
+  /* Allocation */
+  .bar{ display:flex; gap:2px; width:100%; height:22px; margin-bottom:15px; }
+  .bar .seg{ height:100%; border-radius:5px; min-width:4px; transition:flex-basis .6s cubic-bezier(.2,.7,.2,1); }
+  .legend{ display:flex; flex-direction:column; gap:11px; }
+  .legrow{ display:flex; align-items:center; gap:10px; font-size:14px; }
+  .dot{ width:10px; height:10px; border-radius:3px; flex:0 0 auto; }
+  .legrow .name{ color:var(--ink2); }
+  .legrow .pct{ color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+  .legrow .amt{ margin-left:auto; font-weight:650; font-variant-numeric:tabular-nums; }
 
   /* Accounts */
-  .rows { display:flex; flex-direction:column; }
-  .row { display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--grid); }
-  .row:first-child { border-top:0; }
-  .row .name { display:flex; align-items:center; gap:9px; min-width:0; }
-  .row .name span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .row .val { margin-left:auto; text-align:right; }
-  .row .val b { font-weight:600; font-variant-numeric:tabular-nums; }
-  .row .val small { display:block; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+  .rows{ display:flex; flex-direction:column; }
+  .row{ display:flex; align-items:center; gap:11px; padding:12px 0; border-top:1px solid var(--grid); }
+  .row:first-child{ border-top:0; }
+  .row .name{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .row .name span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .row .val{ margin-left:auto; text-align:right; }
+  .row .val b{ font-weight:650; font-variant-numeric:tabular-nums; }
+  .row .val small{ display:block; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums; }
 
-  /* Bridge (adjustments to net worth) */
-  .bridge { display:flex; flex-direction:column; gap:0; }
-  .bline { display:flex; align-items:center; justify-content:space-between; padding:9px 0; font-size:14px; border-top:1px solid var(--grid); }
-  .bline:first-child { border-top:0; }
-  .bline .k { color:var(--ink2); }
-  .bline .v { font-weight:600; font-variant-numeric:tabular-nums; }
-  .bline.total { border-top:1.5px solid var(--border); margin-top:2px; padding-top:12px; }
-  .bline.total .k { color:var(--ink); font-weight:600; }
-  .bline.total .v { font-size:16px; }
-  .pos { color:var(--good); }
-  .neg { color:var(--bad); }
+  /* Bridge */
+  .bridge{ display:flex; flex-direction:column; }
+  .bline{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; font-size:14px; border-top:1px solid var(--grid); }
+  .bline:first-child{ border-top:0; }
+  .bline .k{ color:var(--ink2); }
+  .bline .v{ font-weight:650; font-variant-numeric:tabular-nums; }
+  .bline.total{ border-top:1.5px solid var(--border); margin-top:3px; padding-top:13px; }
+  .bline.total .k{ color:var(--ink); font-weight:650; }
+  .bline.total .v{ font-size:16px; }
+  .pos{ color:var(--growth); } .neg{ color:var(--decline); }
 
-  .foot { text-align:center; font-size:12px; color:var(--muted); line-height:1.6; }
-  .foot .demo { display:inline-block; margin-top:6px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; }
+  .foot{ text-align:center; font-size:11.5px; color:var(--muted); line-height:1.7; padding-top:2px; }
+  .foot .demo{ display:inline-block; margin-top:6px; padding:3px 10px; border:1px solid var(--border); border-radius:999px; }
 
-  /* tooltip */
-  #tip {
-    position:fixed; z-index:10; pointer-events:none; opacity:0; transition:opacity .12s;
-    background:var(--ink); color:var(--surface); font-size:12px; font-weight:600;
-    padding:5px 9px; border-radius:8px; white-space:nowrap; transform:translate(-50%,-125%);
+  #tip{ position:fixed; z-index:20; pointer-events:none; opacity:0; transition:opacity .12s;
+    background:var(--ink); color:var(--surface); font-size:12px; font-weight:600; line-height:1.35;
+    padding:6px 10px; border-radius:9px; white-space:nowrap; transform:translate(-50%,-130%); box-shadow:var(--shadow); }
+  #tip b{ font-weight:750; }
+  #tip .d{ font-weight:600; opacity:.85; }
+
+  @media (prefers-reduced-motion: reduce){
+    .card{ animation:none; } .bar .seg{ transition:none; }
   }
-  @media (prefers-reduced-motion: reduce) { .bar .seg { transition:none; } }
 </style>
 </head>
 <body>
@@ -119,116 +142,137 @@
 <div id="tip"></div>
 <script>
 const KINDS = [
-  { key:"bank",    label:"Банки",    v:"--c-bank" },
-  { key:"cash",    label:"Наличные", v:"--c-cash" },
-  { key:"crypto",  label:"Крипта",   v:"--c-crypto" },
-  { key:"deposit", label:"Вклады",   v:"--c-deposit" },
+  { key:"bank", label:"Банки", v:"--c-bank" },
+  { key:"cash", label:"Наличные", v:"--c-cash" },
+  { key:"crypto", label:"Крипта", v:"--c-crypto" },
+  { key:"deposit", label:"Вклады", v:"--c-deposit" },
 ];
-const KIND_LABEL = Object.fromEntries(KINDS.map(k => [k.key, k.label]));
-const KIND_VAR   = Object.fromEntries(KINDS.map(k => [k.key, k.v]));
+const KIND_VAR = Object.fromEntries(KINDS.map(k => [k.key, k.v]));
+const M_SHORT = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+const M_FULL = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 
 const DEMO = {
-  cur:"₽", total:280576, delta:12000, since:"07.07",
+  total:280576, delta:12000, since:"июнь",
   assets:377576, lent:5000, borrowed:2000, carousel:100000,
   accounts:[
-    {name:"Сбер",        kind:"bank",    cur:"RUB", bal:100000, rub:100000},
-    {name:"Тинькофф",    kind:"bank",    cur:"RUB", bal:0,      rub:0},
-    {name:"Наличные USD",kind:"cash",    cur:"USD", bal:1000,   rub:77490},
-    {name:"BTC",         kind:"crypto",  cur:"BTC", bal:0.01,   rub:50086},
-    {name:"Яндекс вклад",kind:"deposit", cur:"RUB", bal:150000, rub:150000},
+    {name:"Сбербанк", kind:"bank", cur:"RUB", bal:100000, rub:100000},
+    {name:"Т-Банк", kind:"bank", cur:"RUB", bal:27000, rub:27000},
+    {name:"Наличные USD", kind:"cash", cur:"USD", bal:1000, rub:77490},
+    {name:"BTC", kind:"crypto", cur:"BTC", bal:0.01, rub:50086},
+    {name:"Яндекс вклад", kind:"deposit", cur:"RUB", bal:123000, rub:123000},
   ],
-  rates:{USD:77.49, BTC:5008656}, ts:"22:10, 14.07", demo:true
+  rates:{USD:77.49, BTC:5008656},
+  history:[
+    {m:"2026-02", v:210000},{m:"2026-03", v:224500},{m:"2026-04", v:217800},
+    {m:"2026-05", v:241000},{m:"2026-06", v:268500},{m:"2026-07", v:280576},
+  ],
+  ts:"12:40, 15.07", demo:true
 };
 
 const nf0 = new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const nf2 = new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
 function money(x){ return nf0.format(Math.round(x)); }
 function amount(x, cur){
-  if (cur==="BTC"||cur==="ETH") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"") + " " + cur;
-  if (cur==="USD") return nf2.format(x) + " $";
-  if (cur==="USDT") return nf2.format(x) + " USDT";
-  if (cur==="KGS") return nf2.format(x) + " сом";
-  return nf0.format(Math.round(x)) + " ₽";
+  if (cur==="BTC"||cur==="ETH") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"")+" "+cur;
+  if (cur==="USD") return nf2.format(x)+" $";
+  if (cur==="USDT") return nf2.format(x)+" USDT";
+  if (cur==="KGS") return nf2.format(x)+" сом";
+  return nf0.format(Math.round(x))+" ₽";
 }
-
-function readPayload(){
-  const p = new URLSearchParams(location.search).get("d");
-  if (!p) return null;
-  try {
-    const b64 = p.replace(/-/g,"+").replace(/_/g,"/");
-    return JSON.parse(decodeURIComponent(escape(atob(b64))));
-  } catch(e){ return null; }
+function compact(x){
+  const a=Math.abs(x);
+  if (a>=1e6) return (x/1e6).toFixed(x%1e6===0?0:1).replace(".",",")+" млн";
+  if (a>=1e3) return Math.round(x/1e3)+"к";
+  return String(Math.round(x));
 }
-
+function ymLabel(ym, full){
+  const [y,m]=ym.split("-"); const i=parseInt(m,10)-1;
+  return full ? (M_FULL[i]+" "+y) : M_SHORT[i];
+}
 function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
+function readPayload(){
+  const p=new URLSearchParams(location.search).get("d");
+  if(!p) return null;
+  try{ return JSON.parse(decodeURIComponent(escape(atob(p.replace(/-/g,"+").replace(/_/g,"/"))))); }
+  catch(e){ return null; }
+}
+
+const tip=document.getElementById("tip");
+function showTip(html,x,y){ tip.innerHTML=html; tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.opacity="1"; }
+function hideTip(){ tip.style.opacity="0"; }
+
 function render(d){
-  const app = document.getElementById("app");
-  // группируем активы по типу
-  const byKind = {};
-  for (const a of d.accounts) byKind[a.kind] = (byKind[a.kind]||0) + a.rub;
-  const segs = KINDS.filter(k => (byKind[k.key]||0) > 0)
-                    .map(k => ({...k, sum: byKind[k.key]}));
-  const assets = d.assets || segs.reduce((s,x)=>s+x.sum,0) || 1;
+  const app=document.getElementById("app");
+  const hist=(d.history||[]).slice();
 
-  const bar = segs.map(s =>
-    `<div class="seg" style="flex-basis:${(s.sum/assets*100).toFixed(2)}%;background:var(${s.v})"
-      data-tip="${s.label} — ${money(s.sum)} ₽ · ${Math.round(s.sum/assets*100)}%"></div>`
-  ).join("");
+  // дельта: приоритетно месяц-к-месяцу из истории
+  let deltaVal=null, deltaSince="";
+  if (hist.length>=2){ deltaVal=hist[hist.length-1].v-hist[hist.length-2].v; deltaSince=ymLabel(hist[hist.length-2].m,false); }
+  else if (d.delta!=null){ deltaVal=d.delta; deltaSince=d.since||""; }
 
-  const legend = segs.map(s =>
-    `<div class="legrow">
-       <span class="dot" style="background:var(${s.v})"></span>
-       <span class="name">${s.label}</span>
-       <span class="pct">${Math.round(s.sum/assets*100)}%</span>
-       <span class="amt">${money(s.sum)} ₽</span>
-     </div>`
-  ).join("");
+  // активы по типам
+  const byKind={}; for(const a of d.accounts) byKind[a.kind]=(byKind[a.kind]||0)+a.rub;
+  const segs=KINDS.filter(k=>(byKind[k.key]||0)>0).map(k=>({...k,sum:byKind[k.key]}));
+  const assets=d.assets || segs.reduce((s,x)=>s+x.sum,0) || 1;
+  const bar=segs.map(s=>`<div class="seg" style="flex-basis:${(s.sum/assets*100).toFixed(2)}%;background:var(${s.v})"
+     data-tip="${s.label} — ${money(s.sum)} ₽ · ${Math.round(s.sum/assets*100)}%"></div>`).join("");
+  const legend=segs.map(s=>`<div class="legrow"><span class="dot" style="background:var(${s.v})"></span>
+     <span class="name">${s.label}</span><span class="pct">${Math.round(s.sum/assets*100)}%</span>
+     <span class="amt">${money(s.sum)} ₽</span></div>`).join("");
 
-  const accs = d.accounts.map(a => {
-    const sub = a.cur!=="RUB" ? `<small>≈ ${money(a.rub)} ₽</small>` : "";
-    return `<div class="row">
-      <div class="name"><span class="dot" style="background:var(${KIND_VAR[a.kind]||'--muted'})"></span><span>${a.name}</span></div>
-      <div class="val"><b>${amount(a.bal, a.cur)}</b>${sub}</div>
-    </div>`;
+  const accs=d.accounts.map(a=>{
+    const sub=a.cur!=="RUB"?`<small>≈ ${money(a.rub)} ₽</small>`:"";
+    return `<div class="row"><div class="name"><span class="dot" style="background:var(${KIND_VAR[a.kind]||'--muted'})"></span>
+      <span>${a.name}</span></div><div class="val"><b>${amount(a.bal,a.cur)}</b>${sub}</div></div>`;
   }).join("");
 
-  const bridge = [];
+  const bridge=[];
   bridge.push(`<div class="bline"><span class="k">Активы</span><span class="v">${money(d.assets)} ₽</span></div>`);
-  if (d.lent)     bridge.push(`<div class="bline"><span class="k">Мне должны</span><span class="v pos">+${money(d.lent)} ₽</span></div>`);
-  if (d.borrowed) bridge.push(`<div class="bline"><span class="k">Я должен</span><span class="v neg">−${money(d.borrowed)} ₽</span></div>`);
-  if (d.carousel) bridge.push(`<div class="bline"><span class="k">Карусель (долг банку)</span><span class="v neg">−${money(d.carousel)} ₽</span></div>`);
+  if(d.lent) bridge.push(`<div class="bline"><span class="k">Мне должны</span><span class="v pos">+${money(d.lent)} ₽</span></div>`);
+  if(d.borrowed) bridge.push(`<div class="bline"><span class="k">Я должен</span><span class="v neg">−${money(d.borrowed)} ₽</span></div>`);
+  if(d.carousel) bridge.push(`<div class="bline"><span class="k">Карусель (долг банку)</span><span class="v neg">−${money(d.carousel)} ₽</span></div>`);
   bridge.push(`<div class="bline total"><span class="k">Чистый капитал</span><span class="v">${money(d.total)} ₽</span></div>`);
 
-  let chip = "";
-  if (d.delta !== null && d.delta !== undefined){
-    const up = d.delta >= 0;
-    chip = `<div class="chip ${up?"up":"down"}">${up?"▲":"▼"} ${up?"+":"−"}${money(Math.abs(d.delta))} ₽
-             <span class="since">с ${d.since||""}</span></div>`;
+  let chip="";
+  if(deltaVal!==null){
+    const up=deltaVal>=0;
+    chip=`<div class="chip ${up?"up":"down"}">${up?"↑":"↓"} ${up?"+":"−"}${money(Math.abs(deltaVal))} ₽
+      <span class="since">${deltaSince?"с "+deltaSince:""}</span></div>`;
   }
+  const usd=(d.rates&&d.rates.USD)?`≈ ${money(d.total/d.rates.USD)} $`:"";
 
-  const rateBits = [];
-  if (d.rates && d.rates.USD) rateBits.push(`USD ${nf2.format(d.rates.USD)} ₽`);
-  if (d.rates && d.rates.BTC) rateBits.push(`BTC ${money(d.rates.BTC)} ₽`);
+  const rateBits=[];
+  if(d.rates&&d.rates.USD) rateBits.push(`USD ${nf2.format(d.rates.USD)} ₽`);
+  if(d.rates&&d.rates.BTC) rateBits.push(`BTC ${money(d.rates.BTC)} ₽`);
 
-  app.innerHTML = `
-    <div class="topbar"><h1>💼 Мой капитал</h1><div class="upd">${d.ts||""}</div></div>
+  app.innerHTML=`
+    <div class="topbar">
+      <div class="brand"><span class="mk">💼</span>Мой капитал</div>
+      <div class="upd">${d.ts||""}</div>
+    </div>
 
     <div class="card hero">
       <div class="label">Чистый капитал</div>
       <div class="total">${money(d.total)}<span class="cur">₽</span></div>
+      ${usd?`<div class="sub">${usd}</div>`:""}
       ${chip}
     </div>
 
-    ${segs.length ? `<div class="card">
+    <div class="card">
+      <p class="eyebrow">Динамика по месяцам</p>
+      <div class="chartwrap" id="chart"></div>
+    </div>
+
+    ${segs.length?`<div class="card">
       <p class="eyebrow">Активы по типам</p>
       <div class="bar">${bar}</div>
       <div class="legend">${legend}</div>
-    </div>` : ""}
+    </div>`:""}
 
     <div class="card">
       <p class="eyebrow">Счета</p>
-      <div class="rows">${accs || '<div class="row"><span class="name">Пока нет счетов</span></div>'}</div>
+      <div class="rows">${accs||'<div class="row"><span class="name">Пока нет счетов</span></div>'}</div>
     </div>
 
     <div class="card">
@@ -236,31 +280,94 @@ function render(d){
       <div class="bridge">${bridge.join("")}</div>
     </div>
 
-    <div class="foot">
-      ${rateBits.join(" · ")}
-      ${d.demo ? '<br><span class="demo">демо-данные</span>' : ""}
-    </div>`;
+    <div class="foot">${rateBits.join(" · ")}${d.demo?'<br><span class="demo">демо-данные</span>':""}</div>`;
 
-  wireTooltip();
+  renderChart(hist, document.getElementById("chart"));
+  wireAllocation();
 }
 
-function wireTooltip(){
-  const tip = document.getElementById("tip");
-  document.querySelectorAll(".seg[data-tip]").forEach(el => {
-    const show = (x,y) => { tip.textContent = el.dataset.tip; tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.opacity="1"; };
-    const hide = () => tip.style.opacity="0";
-    el.addEventListener("mousemove", e => show(e.clientX, e.clientY));
-    el.addEventListener("mouseleave", hide);
-    el.addEventListener("touchstart", e => { const t=e.touches[0]; show(t.clientX, t.clientY); }, {passive:true});
-    el.addEventListener("touchend", () => setTimeout(hide, 1200));
+function renderChart(series, mount){
+  if(!series || series.length===0){ mount.innerHTML='<div class="emptychart">История появится после первого «Ревью».</div>'; return; }
+  if(series.length===1){
+    mount.innerHTML=`<div class="emptychart">${ymLabel(series[0].m,true)}: <b>${money(series[0].v)} ₽</b><br>
+      Сделай «Ревью» в следующем месяце — появится график.</div>`; return;
+  }
+  const W=340, H=156, padL=6, padR=6, padT=16, padB=24;
+  const vals=series.map(s=>s.v);
+  let min=Math.min(...vals), max=Math.max(...vals);
+  const range=(max-min)||Math.max(Math.abs(max),1);
+  const ymin=min-range*0.18, ymax=max+range*0.22;
+  const plotW=W-padL-padR, plotH=H-padT-padB, base=H-padB;
+  const xs=i=>padL+(series.length===1?plotW/2:i*plotW/(series.length-1));
+  const ys=v=>padT+(1-(v-ymin)/(ymax-ymin))*plotH;
+  const pts=series.map((s,i)=>({x:xs(i), y:ys(s.v), m:s.m, v:s.v}));
+
+  const up=series[series.length-1].v>=series[0].v;
+  const col=up?css("--growth"):css("--decline");
+
+  const line="M"+pts.map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L");
+  const area=line+` L${pts[pts.length-1].x.toFixed(1)} ${base} L${pts[0].x.toFixed(1)} ${base} Z`;
+
+  const grids=[0,.5,1].map(f=>{ const y=padT+f*plotH; return `<line class="grid" x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}"/>`; }).join("");
+  const n=series.length;
+  const xlabs=pts.map((p,i)=>{
+    const show = n<=7 || i%Math.ceil(n/6)===0 || i===n-1;
+    return show?`<text class="xlab" x="${p.x.toFixed(1)}" y="${H-7}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}">${ymLabel(p.m,false)}</text>`:"";
+  }).join("");
+  const dots=pts.map((p,i)=>`<circle class="pt${i===n-1?' last':''}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===n-1?4.5:3}" style="stroke:${col}"/>`).join("");
+  const last=pts[n-1];
+  const vlab=`<text class="vlab" x="${last.x.toFixed(1)}" y="${(ys(last.v)-11).toFixed(1)}" text-anchor="end" fill="${col}">${compact(last.v)}</text>`;
+
+  mount.innerHTML=`
+    <svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="График капитала по месяцам">
+      <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${col}" stop-opacity="0.28"/>
+        <stop offset="1" stop-color="${col}" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${grids}
+      <path class="area" d="${area}" fill="url(#ag)"/>
+      <path class="line" d="${line}" style="stroke:${col}"/>
+      ${xlabs}${dots}${vlab}
+      <line class="cross" id="cx" x1="0" y1="${padT}" x2="0" y2="${base}"/>
+      <circle class="focus" id="fc" r="5.5" fill="var(--surface)" style="stroke:${col}"/>
+      <rect x="0" y="0" width="${W}" height="${H}" fill="transparent" id="hit"/>
+    </svg>`;
+
+  const svg=mount.querySelector("svg"), cx=mount.querySelector("#cx"), fc=mount.querySelector("#fc"), hit=mount.querySelector("#hit");
+  function at(clientX, clientY){
+    const r=svg.getBoundingClientRect();
+    const vx=(clientX-r.left)/r.width*W;
+    let i=Math.round((vx-padL)/(plotW/(n-1))); i=Math.max(0,Math.min(n-1,i));
+    const p=pts[i];
+    cx.setAttribute("x1",p.x); cx.setAttribute("x2",p.x); cx.style.opacity=".8";
+    fc.setAttribute("cx",p.x); fc.setAttribute("cy",p.y); fc.style.opacity="1";
+    const prev=i>0?series[i-1].v:null;
+    const dv=prev!==null?p.v-prev:null;
+    const dtxt=dv!==null?`<span class="d" style="color:${dv>=0?css('--growth'):css('--decline')}">${dv>=0?"▲ +":"▼ −"}${money(Math.abs(dv))} ₽</span>`:"";
+    const px=r.left+p.x/W*r.width, py=r.top+p.y/H*r.height;
+    showTip(`${ymLabel(p.m,true)}<br><b>${money(p.v)} ₽</b> ${dtxt}`, px, py);
+  }
+  hit.addEventListener("mousemove", e=>at(e.clientX,e.clientY));
+  hit.addEventListener("mouseleave", ()=>{ cx.style.opacity="0"; fc.style.opacity="0"; hideTip(); });
+  hit.addEventListener("touchstart", e=>{ const t=e.touches[0]; at(t.clientX,t.clientY); }, {passive:true});
+  hit.addEventListener("touchmove", e=>{ const t=e.touches[0]; at(t.clientX,t.clientY); }, {passive:true});
+  hit.addEventListener("touchend", ()=>{ setTimeout(()=>{ cx.style.opacity="0"; fc.style.opacity="0"; hideTip(); }, 1400); });
+}
+
+function wireAllocation(){
+  document.querySelectorAll(".seg[data-tip]").forEach(el=>{
+    const show=(x,y)=>showTip(el.dataset.tip,x,y);
+    el.addEventListener("mousemove", e=>show(e.clientX,e.clientY));
+    el.addEventListener("mouseleave", hideTip);
+    el.addEventListener("touchstart", e=>{ const t=e.touches[0]; show(t.clientX,t.clientY); }, {passive:true});
+    el.addEventListener("touchend", ()=>setTimeout(hideTip,1200));
   });
 }
 
-// тема из Telegram, иначе — системная
-const tg = window.Telegram && window.Telegram.WebApp;
-if (tg){
+const tg=window.Telegram && window.Telegram.WebApp;
+if(tg){
   tg.ready(); tg.expand();
-  const applyTheme = () => document.documentElement.setAttribute("data-theme", tg.colorScheme);
+  const applyTheme=()=>document.documentElement.setAttribute("data-theme", tg.colorScheme);
   applyTheme(); tg.onEvent("themeChanged", applyTheme);
 }
 
