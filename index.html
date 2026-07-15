@@ -173,10 +173,10 @@ const nf0 = new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
 const nf2 = new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
 function money(x){ return nf0.format(Math.round(x)); }
 function amount(x, cur){
-  if (cur==="BTC"||cur==="ETH") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"")+" "+cur;
-  if (cur==="USD") return nf2.format(x)+" $";
+  if (cur==="BTC"||cur==="ETH"||cur==="SOL") return (+x).toFixed(8).replace(/0+$/,"").replace(/\.$/,"")+" "+cur;
   if (cur==="USDT") return nf2.format(x)+" USDT";
-  if (cur==="KGS") return nf2.format(x)+" сом";
+  if (cur==="USD") return nf0.format(Math.round(x))+" $";
+  if (cur==="KGS") return nf0.format(Math.round(x))+" сом";
   return nf0.format(Math.round(x))+" ₽";
 }
 function compact(x){
