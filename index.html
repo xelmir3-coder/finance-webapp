@@ -12,7 +12,7 @@
     --grid:#e7e9ee; --border:rgba(14,17,22,0.08);
     --accent:#2a78d6; --accent-soft:rgba(42,120,214,0.10);
     --growth:#0a8f5f; --decline:#c23b32;
-    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9;
+    --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9; --c-stock:#eb6834; --c-other:#e87ba4;
     --shadow:0 1px 2px rgba(14,17,22,.05), 0 10px 30px -12px rgba(14,17,22,.18);
   }
   @media (prefers-color-scheme: dark) {
@@ -22,20 +22,20 @@
       --grid:#242932; --border:rgba(255,255,255,0.09);
       --accent:#4d97ef; --accent-soft:rgba(77,151,239,0.14);
       --growth:#1fce8c; --decline:#e2685c;
-      --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0;
+      --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0; --c-stock:#d95926; --c-other:#d55181;
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="light"]{
     --page:#eef0f3; --surface:#ffffff; --surface-2:#f6f7f9; --ink:#0e1116; --ink2:#565d68; --muted:#8a919c;
     --grid:#e7e9ee; --border:rgba(14,17,22,0.08); --accent:#2a78d6; --accent-soft:rgba(42,120,214,0.10);
-    --growth:#0a8f5f; --decline:#c23b32; --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9;
+    --growth:#0a8f5f; --decline:#c23b32; --c-bank:#2a78d6; --c-cash:#1baf7a; --c-crypto:#eda100; --c-deposit:#6b52c9; --c-stock:#eb6834; --c-other:#e87ba4;
     --shadow:0 1px 2px rgba(14,17,22,.05), 0 10px 30px -12px rgba(14,17,22,.18);
   }
   :root[data-theme="dark"]{
     --page:#0c0e12; --surface:#15181e; --surface-2:#1b1f27; --ink:#f3f5f8; --ink2:#aab2bf; --muted:#727a86;
     --grid:#242932; --border:rgba(255,255,255,0.09); --accent:#4d97ef; --accent-soft:rgba(77,151,239,0.14);
-    --growth:#1fce8c; --decline:#e2685c; --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0;
+    --growth:#1fce8c; --decline:#e2685c; --c-bank:#4d97ef; --c-cash:#1cc98a; --c-crypto:#e0a52a; --c-deposit:#9d8bf0; --c-stock:#d95926; --c-other:#d55181;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
   }
 
@@ -146,6 +146,8 @@ const KINDS = [
   { key:"cash", label:"Наличные", v:"--c-cash" },
   { key:"crypto", label:"Крипта", v:"--c-crypto" },
   { key:"deposit", label:"Вклады", v:"--c-deposit" },
+  { key:"stock", label:"Акции", v:"--c-stock" },
+  { key:"other", label:"Другое", v:"--c-other" },
 ];
 const KIND_VAR = Object.fromEntries(KINDS.map(k => [k.key, k.v]));
 const M_SHORT = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
@@ -177,7 +179,8 @@ function amount(x, cur){
   if (cur==="USDT") return nf2.format(x)+" USDT";
   if (cur==="USD") return nf0.format(Math.round(x))+" $";
   if (cur==="KGS") return nf0.format(Math.round(x))+" сом";
-  return nf0.format(Math.round(x))+" ₽";
+  if (cur==="RUB") return nf0.format(Math.round(x))+" ₽";
+  return (+x).toFixed(4).replace(/0+$/,"").replace(/\.$/,"")+" "+cur; // тикер акции
 }
 function compact(x){
   const a=Math.abs(x);
