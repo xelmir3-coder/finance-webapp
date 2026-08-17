@@ -226,6 +226,7 @@ function amount(x,cur){
   if(cur==="USDT")return nf2.format(x)+" USDT";
   if(cur==="USD")return money(x)+" $";
   if(cur==="KGS")return money(x)+" сом";
+  if(cur==="CNY")return money(x)+" ¥";
   if(cur==="RUB")return money(x)+" ₽";
   return (+x).toFixed(4).replace(/0+$/,"").replace(/\.$/,"")+" "+cur;
 }
