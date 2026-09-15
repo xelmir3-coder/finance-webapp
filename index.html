@@ -215,6 +215,11 @@ const DEMO={
     {m:"2026-02",v:305000},{m:"2026-03",v:322000},{m:"2026-04",v:314000},
     {m:"2026-05",v:351000},{m:"2026-06",v:378000},{m:"2026-07",v:397181},
   ],
+  expenses:[
+    {n:"Аренда",a:35000,d:1},{n:"Коммуналка",a:6500,d:10},
+    {n:"Спортзал",a:2500,d:null},{n:"Интернет",a:700,d:5},{n:"Мобильный",a:600,d:15},
+  ],
+  exp_month:45300,
   ts:"демо", demo:true
 };
 
@@ -282,6 +287,16 @@ function render(d){
   if(d.rates&&d.rates.USD) rateBits.push(`USD ${nf2.format(d.rates.USD)} ₽`);
   if(d.rates&&d.rates.BTC) rateBits.push(`BTC ${money(d.rates.BTC)} ₽`);
 
+  const exps=d.expenses||[], expM=d.exp_month||0;
+  let expCard="";
+  if(exps.length){
+    const erows=exps.map(e=>`<div class="bline"><span class="k">${e.n}${e.d?` <span style="color:var(--muted)">· ${e.d}-го</span>`:""}</span><span class="v">${money(e.a)} ₽</span></div>`).join("");
+    const runway=expM>0?Math.round(d.total/expM):null;
+    expCard=`<div class="panel"><p class="eyebrow">Регулярные расходы<span class="ln"></span></p>${erows}
+      <div class="bline total"><span class="k">В месяц</span><span class="v neg">−${money(expM)} ₽</span></div>
+      ${runway!==null?`<div class="foot" style="text-align:left;margin-top:9px">Капитала хватило бы на ~${runway} мес. · в год ${money(expM*12)} ₽</div>`:""}</div>`;
+  }
+
   app.innerHTML=`
     <div class="topbar">
       <div class="brand">${COIN}<b>Мой капитал</b></div>
@@ -305,6 +320,8 @@ function render(d){
       <div class="rows">${accs||'<div class="row"><span class="nm">Пока нет счетов</span></div>'}</div></div>
 
     <div class="panel"><p class="eyebrow">Как складывается капитал<span class="ln"></span></p>${br.join("")}</div>
+
+    ${expCard}
 
     <div class="foot">${rateBits.join(" · ")}${d.demo?'<br><span class="demo">✦ демо-данные ✦</span>':""}</div>`;
 
