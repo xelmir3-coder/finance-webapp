@@ -220,6 +220,10 @@ const DEMO={
     {n:"Спортзал",a:2500,d:null},{n:"Интернет",a:700,d:5},{n:"Мобильный",a:600,d:15},
   ],
   exp_month:45300,
+  expense_history:[
+    {m:"2026-04",v:41000},{m:"2026-05",v:39500},{m:"2026-06",v:37800},
+    {m:"2026-07",v:37500},{m:"2026-08",v:40200},{m:"2026-09",v:45300},
+  ],
   ts:"демо", demo:true
 };
 
@@ -297,6 +301,11 @@ function render(d){
       ${runway!==null?`<div class="foot" style="text-align:left;margin-top:9px">Капитала хватило бы на ~${runway} мес. · в год ${money(expM*12)} ₽</div>`:""}</div>`;
   }
 
+  const expHist=d.expense_history||[];
+  const expChartCard = expHist.length
+    ? `<div class="panel"><p class="eyebrow">Динамика расходов<span class="ln"></span></p><div id="expchart"></div></div>`
+    : "";
+
   app.innerHTML=`
     <div class="topbar">
       <div class="brand">${COIN}<b>Мой капитал</b></div>
@@ -323,12 +332,43 @@ function render(d){
 
     ${expCard}
 
+    ${expChartCard}
+
     <div class="foot">${rateBits.join(" · ")}${d.demo?'<br><span class="demo">✦ демо-данные ✦</span>':""}</div>`;
 
   document.querySelector(".brand svg").setAttribute("class","sig");
   renderChart(hist,document.getElementById("chart"));
+  if(expHist.length) renderBars(expHist, document.getElementById("expchart"));
   wireHud();
   countUp(document.getElementById("totalNum"), d.total);
+}
+
+function renderBars(series,mount){
+  const W=340,H=150,padL=8,padR=8,padT=18,padB=22,n=series.length;
+  const vals=series.map(s=>s.v), max=Math.max(...vals,1);
+  const plotW=W-padL-padR, plotH=H-padT-padB, base=H-padB, slot=plotW/n, bw=Math.min(38,slot*0.62);
+  const cs=getComputedStyle(document.documentElement);
+  const col=cs.getPropertyValue("--dire").trim(), gold=cs.getPropertyValue("--gold1").trim();
+  let bars="",labs="",vlabs=""; const pos=[];
+  series.forEach((s,i)=>{
+    const x=padL+slot*i+slot/2, h=Math.max(2,s.v/max*plotH), y=base-h;
+    pos.push({x,y,v:s.v,m:s.m});
+    bars+=`<rect x="${(x-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${col}" opacity="0.88" style="filter:drop-shadow(0 0 5px ${col})"/>`;
+    if(n<=7||i%2===0||i===n-1) labs+=`<text class="lbl" x="${x.toFixed(1)}" y="${H-6}" text-anchor="middle">${ymL(s.m,false)}</text>`;
+    if(n<=6) vlabs+=`<text class="vlab" x="${x.toFixed(1)}" y="${(y-6).toFixed(1)}" text-anchor="middle" fill="${gold}">${compact(s.v)}</text>`;
+  });
+  mount.innerHTML=`<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <line class="grid" x1="${padL}" y1="${base}" x2="${W-padR}" y2="${base}"/>
+    ${bars}${labs}${vlabs}
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent" id="ehit"/></svg>`;
+  const svg=mount.querySelector("svg"), hit=mount.querySelector("#ehit");
+  function at(cx){ const r=svg.getBoundingClientRect(); const vx=(cx-r.left)/r.width*W; let i=Math.floor((vx-padL)/slot); i=Math.max(0,Math.min(n-1,i)); const p=pos[i];
+    showTip(`${ymL(p.m,true)}<br><b>${money(p.v)} ₽</b>`, r.left+p.x/W*r.width, r.top+p.y/H*r.height); }
+  hit.addEventListener("mousemove",e=>at(e.clientX));
+  hit.addEventListener("mouseleave",hideTip);
+  hit.addEventListener("touchstart",e=>at(e.touches[0].clientX),{passive:true});
+  hit.addEventListener("touchmove",e=>at(e.touches[0].clientX),{passive:true});
+  hit.addEventListener("touchend",()=>setTimeout(hideTip,1400));
 }
 
 function countUp(el,target){
