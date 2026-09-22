@@ -13,7 +13,7 @@
     --radiant:#39e2b4; --radiant2:#1a8f76; --rglow:rgba(57,226,180,.45);
     --dire:#f0574a; --dire2:#a3271d; --dglow:rgba(240,87,74,.45);
     --c-bank:#e6c26a; --c-cash:#e0913c; --c-crypto:#33e0d6;
-    --c-deposit:#9a86ff; --c-stock:#63d06a; --c-other:#e074c0;
+    --c-deposit:#9a86ff; --c-stock:#63d06a; --c-bond:#5aa0e0; --c-other:#e074c0;
     --frame:linear-gradient(150deg,#f8e7ad 0%,#c79a35 32%,#5f470f 52%,#e6c26a 78%,#8a6a1e 100%);
   }
   *{ box-sizing:border-box; }
@@ -174,6 +174,7 @@ const KINDS=[
   {key:"crypto",label:"Крипта",v:"--c-crypto"},
   {key:"deposit",label:"Вклады",v:"--c-deposit"},
   {key:"stock",label:"Акции",v:"--c-stock"},
+  {key:"bond",label:"Облигации",v:"--c-bond"},
   {key:"other",label:"Другое",v:"--c-other"},
 ];
 const KV=Object.fromEntries(KINDS.map(k=>[k.key,k.v]));
@@ -238,6 +239,7 @@ function amount(x,cur){
   if(cur==="KGS")return money(x)+" сом";
   if(cur==="CNY")return money(x)+" ¥";
   if(cur==="RUB")return money(x)+" ₽";
+  if(/^\d+$/.test(cur))return (+x).toFixed(4).replace(/0+$/,"").replace(/\.$/,"")+" шт";
   return (+x).toFixed(4).replace(/0+$/,"").replace(/\.$/,"")+" "+cur;
 }
 const ymL=(ym,full)=>{const[y,m]=ym.split("-");const i=+m-1;return full?M_FULL[i]+" "+y:M_SHORT[i];};
