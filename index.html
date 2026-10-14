@@ -261,13 +261,15 @@ function render(d){
   document.querySelector(".sig2").innerHTML=COIN;
   const app=document.getElementById("app");
   const hist=d.history||[];
-  // дельта = изменение с последнего снимка (Ревью) — как в боте
+  // дельта = изменение с последнего снимка прошлого месяца (обычно прошлое ревью) — как в боте
   let dv=null,ds="";
   if(d.delta!==null&&d.delta!==undefined){dv=d.delta;ds=d.since||"";}
 
-  const byKind={}; for(const a of d.accounts) byKind[a.kind]=(byKind[a.kind]||0)+a.rub;
+  // по типам считаем только СВОИ деньги: без чужих, которые лежат на счетах (долг «я должен», карусель)
+  const byKind={}; for(const a of d.accounts){const v=(a.own!==undefined?a.own:a.rub); byKind[a.kind]=(byKind[a.kind]||0)+v;}
   const segs=KINDS.filter(k=>(byKind[k.key]||0)>0).map(k=>({...k,sum:byKind[k.key]}));
-  const assets=d.assets||segs.reduce((s,x)=>s+x.sum,0)||1;
+  const assets=segs.reduce((s,x)=>s+x.sum,0)||1;
+  const foreign=d.accounts.reduce((s,a)=>s+(a.own!==undefined?a.rub-a.own:0),0);
   const hud=segs.map(s=>`<div class="seg" style="flex-basis:${(s.sum/assets*100).toFixed(2)}%;background:var(${s.v});color:var(${s.v})"
      data-tip="${s.label} — ${money(s.sum)} ₽ · ${Math.round(s.sum/assets*100)}%"></div>`).join("");
   const legend=segs.map(s=>`<div class="legrow">${icon(s.key,"ic",s.v)}<span class="nm">${s.label}</span>
@@ -325,8 +327,9 @@ function render(d){
 
     <div class="panel"><p class="eyebrow">Динамика по месяцам<span class="ln"></span></p><div id="chart"></div></div>
 
-    ${segs.length?`<div class="panel"><p class="eyebrow">Активы по типам<span class="ln"></span></p>
-      <div class="hud">${hud}</div><div class="legend">${legend}</div></div>`:""}
+    ${segs.length?`<div class="panel"><p class="eyebrow">Мои активы по типам<span class="ln"></span></p>
+      <div class="hud">${hud}</div><div class="legend">${legend}</div>
+      ${foreign>0?`<div class="bline" style="margin-top:6px"><span class="k" style="color:var(--muted)">Без чужих денег на счетах (долг, карусель)</span><span class="v" style="color:var(--muted)">−${money(foreign)} ₽</span></div>`:""}</div>`:""}
 
     <div class="panel"><p class="eyebrow">Счета<span class="ln"></span></p>
       <div class="rows">${accs||'<div class="row"><span class="nm">Пока нет счетов</span></div>'}</div></div>
