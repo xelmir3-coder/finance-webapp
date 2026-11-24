@@ -327,6 +327,8 @@ function render(d){
 
     <div class="panel"><p class="eyebrow">Динамика по месяцам<span class="ln"></span></p><div id="chart"></div></div>
 
+    ${d.parts ? `<div class="panel"><p class="eyebrow">Капитал по трём частям<span class="ln"></span></p><div id="capitalParts"></div></div>` : ""}
+
     ${segs.length?`<div class="panel"><p class="eyebrow">Мои активы по типам<span class="ln"></span></p>
       <div class="hud">${hud}</div><div class="legend">${legend}</div>
       ${foreign>0?`<div class="bline" style="margin-top:6px"><span class="k" style="color:var(--muted)">Без чужих денег на счетах (долг, карусель)</span><span class="v" style="color:var(--muted)">−${money(foreign)} ₽</span></div>`:""}</div>`:""}
@@ -344,9 +346,22 @@ function render(d){
 
   document.querySelector(".brand svg").setAttribute("class","sig");
   renderChart(hist,document.getElementById("chart"));
+  if(d.parts) renderCapitalParts(d,document.getElementById("capitalParts"));
   if(expHist.length) renderBars(expHist, document.getElementById("expchart"));
   wireHud();
   countUp(document.getElementById("totalNum"), d.total);
+}
+
+function renderCapitalParts(d,mount){
+  const labels={rub:"Рубли",fx:"Доллары и валюта",crypto:"Криптовалюта"};
+  const prev=d.parts_history?.at(-1);
+  const since=prev?.ts.slice(0,10).split("-").reverse().join(".");
+  mount.innerHTML=Object.entries(labels).map(([key,label])=>{
+    const diff=prev && !d.parts_partial ? d.parts[key]-prev[key] : null;
+    return `<div class="bline"><span class="k">${label}</span><b class="v">${money(d.parts[key])} ₽</b></div>
+      ${diff===null?"":`<div class="bline"><span class="k">С ${since}</span><span class="v ${diff<0?"neg":"pos"}">${diff<0?"−":"+"}${money(Math.abs(diff))} ₽</span></div>`}`;
+  }).join("")+`<div class="foot" style="text-align:left">Акции, ОФЗ и вклады в рублях входят в рублёвую часть. Изменение учитывает переоценку и переводы между частями.
+    ${d.parts_partial?" Часть котировок недоступна.":!prev?" Изменения появятся после первого снимка с разбивкой.":""}</div>`;
 }
 
 function renderBars(series,mount){
